@@ -1,0 +1,35 @@
+# Multi-Stage Dockerfile for Next.js Web Client
+
+# Stage 1: Build stage
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json tsconfig.json ./
+COPY apps/web/package.json ./apps/web/
+
+RUN npm install
+
+COPY apps/web ./apps/web
+
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN npm run build --workspace=apps/web
+
+# Stage 2: Runner Stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+USER node
+
+COPY --chown=node:node apps/web/public ./apps/web/public
+COPY --chown=node:node --from=builder /app/apps/web/.next/standalone ./
+COPY --chown=node:node --from=builder /app/apps/web/.next/static ./apps/web/.next/static
+
+EXPOSE 3000
+
+ENV PORT=3000
+CMD ["node", "apps/web/server.js"]

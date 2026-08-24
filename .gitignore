@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Builds
+dist/
+build/
+.next/
+out/
+
+# Environment Variables
+.env
+.env.local
+.env.production
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Database / Storage
+*.sqlite
+*.db
+
+# Docker / OS
+.DS_Store
+Thumbs.db

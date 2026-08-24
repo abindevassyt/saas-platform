@@ -1,0 +1,102 @@
+openapi: 3.0.3
+info:
+  title: Multi-Tenant SaaS Platform API
+  description: Enterprise production-ready API engine with tenant RBAC isolation, JWT cookies, rate limiting, and real-time WebSockets.
+  version: 1.0.0
+servers:
+  - url: http://localhost:4000/api/v1
+    description: Local Docker Development Gateway
+  - url: https://api.nexus-saas.com/api/v1
+    description: Production Cloud Gateway
+
+paths:
+  /auth/register:
+    post:
+      summary: Register new user & create initial tenant organization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name, organizationName]
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+                  minLength: 8
+                name:
+                  type: string
+                organizationName:
+                  type: string
+      responses:
+        '201':
+          description: Account created successfully
+
+  /auth/login:
+    post:
+      summary: Authenticate user & issue access JWT cookie
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+
+  /resources/projects:
+    get:
+      summary: List tenant projects (Paginated & Filtered)
+      parameters:
+        - in: header
+          name: x-tenant-id
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Projects dataset returned with pagination metadata
+
+    post:
+      summary: Create new project in tenant context
+      parameters:
+        - in: header
+          name: x-tenant-id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        '201':
+          description: Project created successfully

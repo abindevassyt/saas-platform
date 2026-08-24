@@ -1,0 +1,25 @@
+http://localhost:80 {
+  # Reverse proxy API requests
+  handle /api/* {
+    reverse_proxy api:4000
+  }
+
+  # Health and Metrics Probes
+  handle /health {
+    reverse_proxy api:4000
+  }
+
+  handle /metrics {
+    reverse_proxy api:4000
+  }
+
+  # WebSockets
+  handle /socket.io/* {
+    reverse_proxy api:4000
+  }
+
+  # All other requests to Next.js Web Frontend
+  handle {
+    reverse_proxy web:3000
+  }
+}
